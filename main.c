@@ -2,9 +2,11 @@
 #include "tarefas.h"
 
 int main(){
-    funcao fs[] = {criar, deletar, listar, salvar, carregar};
-
+    // Declaração de um array de ponteiros para função 'funcao' chamado fs, inicializado com as funções do arquivo "tarefas.h".
+    funcao fs[] = {criar, deletar, listar, salvar, carregar, exportar};
+    // Declaração de um array de estruturas Tarefa chamado 'tarefas' com tamanho TOTAL.
     Tarefa tarefas[TOTAL];
+
     int pos;
 
     ERROS erro = fs[4](tarefas, &pos);
@@ -23,6 +25,7 @@ int main(){
 
     int opcao;
     do{
+
         printf("\nMenu principal\n");
         printf("1 - Criar tarefa\n");
         printf("2 - Deletar tarefa\n");
@@ -61,8 +64,16 @@ int main(){
             printf("Sair...\n");
         }
 
-    } while(opcao >= 0);
 
+    } while(opcao != -1); // Continua no loop até que o usuário escolha sair.
+
+    if (opcao == -1) { // Se a opção for -1 (Sair), então exporta as tarefas para um arquivo de texto
+        ERROS exportar_erro = fs[5](tarefas, &pos); // Chama a função exportar
+        if (exportar_erro == OK) // mensagem de sucesso
+            printf("Tarefas exportadas com sucesso para um arquivo de texto!\n");
+        else
+            printf("Erro ao exportar as tarefas para o arquivo de texto!\n"); // mensagem de erro
+    }
 
     erro = fs[3](tarefas, &pos);
     if (erro == ABRIR) {
@@ -75,3 +86,4 @@ int main(){
   
     return 0;
 }
+

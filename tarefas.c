@@ -19,11 +19,11 @@ ERROS criar(Tarefa tarefas[], int *pos){
     fgets(tarefas[*pos].descricao, MAX_DESCRICAO, stdin);
     clearBuffer();
 
-    *pos = *pos + 1;
+    *pos = *pos + 1; // Atualiza a posição atual das tarefas.
 
     return OK;
 }
-
+ // Função para deletar uma tarefa.
 ERROS deletar(Tarefa tarefas[], int *pos){
     // teste se existem tarefas
     if(*pos == 0)
@@ -37,6 +37,7 @@ ERROS deletar(Tarefa tarefas[], int *pos){
     if(pos_deletar >= *pos || pos_deletar < 0)
         return NAO_ENCONTRADO;
 
+// Move as tarefas uma posição para frente para preencher o espaço da tarefa deletada.
     for(int i = pos_deletar; i < *pos; i++){
         tarefas[i].prioridade = tarefas[i+1].prioridade;
         strcpy(tarefas[i].categoria, tarefas[i+1].categoria);
@@ -48,6 +49,7 @@ ERROS deletar(Tarefa tarefas[], int *pos){
     return OK;
 }
 
+// Função para listar todas as tarefas.
 ERROS listar(Tarefa tarefas[], int *pos){
     if(*pos == 0)
         return SEM_TAREFAS;
@@ -85,30 +87,56 @@ ERROS listar(Tarefa tarefas[], int *pos){
                 }
             }
         }
+
     }
 
     return OK;
 }
 
+// Função para salvar as tarefas em um arquivo binário.
 ERROS salvar(Tarefa tarefas[], int *pos){
-    FILE *f = fopen("tarefas.bin", "wb");
+    FILE *f = fopen("tarefas.bin", "wb");  // Abre o arquivo para escrita binária.
     if(f == NULL)
         return ABRIR;
 
-    int qtd = fwrite(tarefas, TOTAL, sizeof(Tarefa), f);
+    int qtd = fwrite(tarefas, TOTAL, sizeof(Tarefa), f);  // Escreve as tarefas no arquivo.
     if(qtd == 0)
         return ESCREVER;
 
-    qtd = fwrite(pos, 1, sizeof(int), f);
+    qtd = fwrite(pos, 1, sizeof(int), f); // Escreve a posição atual no arquivo.
     if(qtd == 0)
-        return ESCREVER;
+        return ESCREVER; 
 
-    if(fclose(f))
+    if(fclose(f)) // fecha o arquivo
         return FECHAR;
 
     return OK;
 }
+ERROS exportar(Tarefa tarefas[], int *pos){ // Função para exportar as tarefas para um arquivo de texto.
+    char nome_arquivo[100];
 
+    printf("Digite o nome do arquivo para exportar as tarefas: ");
+    scanf("%s", nome_arquivo);
+
+    FILE *arquivo = fopen(nome_arquivo, "w"); // Abre o arquivo para escrita.
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return ABRIR;
+    }
+
+    for (int i = 0; i < *pos; i++) { // Escreve as tarefas no arquivo de texto.
+        fprintf(arquivo, "Prioridade: %d\n", tarefas[i].prioridade);
+        fprintf(arquivo, "Categoria: %s", tarefas[i].categoria);
+        fprintf(arquivo, "Descricao: %s", tarefas[i].descricao);
+        fprintf(arquivo, "\n");
+    }
+
+    fclose(arquivo); // fecha o arquivo
+
+    return OK;
+}
+
+//função para carregar as tarefas de um arquivo binário.
 ERROS carregar(Tarefa tarefas[], int *pos){
     FILE *f = fopen("tarefas.bin", "rb");
     if(f == NULL)
@@ -128,7 +156,7 @@ ERROS carregar(Tarefa tarefas[], int *pos){
     return OK;
 
 }
-
+ // Função para limpar o buffer do teclado.
 void clearBuffer(){
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
